@@ -86,10 +86,10 @@ const TestCard = ({
 
   return (
     <>
-      <Card 
-        sx={{ 
-          height: '100%', 
-          display: 'flex', 
+      <Card
+        sx={{
+          height: '100%',
+          display: 'flex',
           flexDirection: 'column',
           cursor: 'pointer',
           '&:hover': {
@@ -452,6 +452,7 @@ const TestSeries = () => {
           <Tab label="All Tests" />
           <Tab label="Subject-wise" />
           <Tab label="Chapter-wise" />
+          <Tab label="Previous Papers" />
         </Tabs>
       </Box>
 
@@ -516,7 +517,65 @@ const TestSeries = () => {
         </Box>
       )}
 
-      {loading ? (
+      {tabValue === 3 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            CAT Exam Previous Year Papers (2000 - 2024)
+          </Typography>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            {['CAT 2024 Slot 1', 'CAT 2024 Slot 2', 'CAT 2024 Slot 3', 'CAT 2023 Slot 1'].map((paper, index) => (
+              <Grid item xs={12} key={index}>
+                <Card variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa' }}>
+                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                    {index + 1}. {paper}
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {['VARC', 'DILR', 'QA'].map((section) => (
+                      <Grid item xs={12} md={4} key={section}>
+                        <Card sx={{ height: '100%' }}>
+                          <CardContent>
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                              <Box sx={{
+                                width: 40, height: 40,
+                                bgcolor: section === 'VARC' ? '#ffe0b2' : section === 'DILR' ? '#ffccbc' : '#dcedc8',
+                                borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2,
+                                fontWeight: 'bold', color: '#555'
+                              }}>
+                                {section[0]}
+                              </Box>
+                              <Typography variant="h6">{section}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                              <Typography variant="body2" color="text.secondary">Total Questions</Typography>
+                              <Typography variant="body2" fontWeight={600}>{section === 'VARC' ? 24 : section === 'QA' ? 22 : 20}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <Typography variant="body2" color="text.secondary">Duration</Typography>
+                              <Typography variant="body2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center' }}>
+                                <TimerIcon sx={{ fontSize: 16, mr: 0.5, color: 'warning.main' }} /> 40 Mins
+                              </Typography>
+                            </Box>
+                          </CardContent>
+                          <CardActions sx={{ px: 2, pb: 2 }}>
+                            <Button variant="contained" color="primary" fullWidth sx={{ textTransform: 'none', bgcolor: '#e65100', '&:hover': { bgcolor: '#bf360c' } }}>
+                              Take Test
+                            </Button>
+                            <Button variant="outlined" fullWidth sx={{ ml: 1, textTransform: 'none', color: '#333', borderColor: '#333' }}>
+                              PDF
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
+
+      {tabValue !== 3 && (loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
           <Typography>Loading tests...</Typography>
         </Box>
@@ -551,7 +610,7 @@ const TestSeries = () => {
             </Grid>
           )}
         </Grid>
-      )}
+      ))}
     </Box>
   );
 };
