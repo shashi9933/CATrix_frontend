@@ -92,19 +92,24 @@ const Colleges = () => {
                       {filteredColleges.map((college) => (
                         <TableRow key={college.id}>
                           <TableCell>{college.name}</TableCell>
-                          <TableCell>{college.location}</TableCell>
-                          <TableCell>{college.cutoff}%</TableCell>
-                          <TableCell>{college.fees}</TableCell>
-                          <TableCell>{college.placement}</TableCell>
+                          <TableCell>{college.location || 'N/A'}</TableCell>
                           <TableCell>
-                            {Array.isArray(college.specializations)
-                              ? college.specializations.map((spec: string) => (
-                                  <Chip key={spec} label={spec} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-                                ))
-                              : null}
+                            {college.cutoff && typeof college.cutoff === 'object'
+                              ? `${(college.cutoff as any).general}% (Gen)`
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell>N/A</TableCell> {/* Fees not in DB yet */}
+                          <TableCell>
+                            {college.placements && typeof college.placements === 'object'
+                              ? `₹${(college.placements as any).averageCTC} LPA`
+                              : 'N/A'}
                           </TableCell>
                           <TableCell>
-                            <Button size="small" color="primary" href={college.website} target="_blank" rel="noopener">
+                            {/* Specializations not in DB yet */}
+                            <Chip label="MBA/PGDM" size="small" />
+                          </TableCell>
+                          <TableCell>
+                            <Button size="small" color="primary" disabled>
                               Visit
                             </Button>
                           </TableCell>
