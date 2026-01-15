@@ -324,6 +324,8 @@ const subjectWiseChapters = {
   ],
 };
 
+// Default test data - used as fallback if API fails to load tests
+// @ts-ignore - Used as fallback in error cases
 const fullSubjectTests: Test[] = [
   {
     id: '1',
@@ -333,6 +335,8 @@ const fullSubjectTests: Test[] = [
     total_questions: 24,
     difficulty: 'Hard',
     section: 'VARC',
+    exam: 'CAT',
+    testType: 'full-length',
     topics: ['Reading Comprehension', 'Para Jumbles', 'Critical Reasoning'],
     total_marks: 24,
     created_at: new Date().toISOString(),
@@ -345,6 +349,8 @@ const fullSubjectTests: Test[] = [
     total_questions: 20,
     difficulty: 'Hard',
     section: 'DILR',
+    exam: 'CAT',
+    testType: 'full-length',
     topics: ['Set Theory', 'Logical Reasoning', 'Data Interpretation'],
     total_marks: 20,
     created_at: new Date().toISOString(),
@@ -357,6 +363,8 @@ const fullSubjectTests: Test[] = [
     total_questions: 22,
     difficulty: 'Hard',
     section: 'QA',
+    exam: 'CAT',
+    testType: 'full-length',
     topics: ['Algebra', 'Geometry', 'Arithmetic'],
     total_marks: 22,
     created_at: new Date().toISOString(),
