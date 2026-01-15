@@ -47,18 +47,24 @@ const ExamWindow = () => {
   useEffect(() => {
     const loadTest = async () => {
       try {
-        if (!user) {
-          window.close();
-          return;
-        }
-
         if (!testId) {
+          console.error('❌ No testId provided');
           setLoading(false);
           return;
         }
 
+        console.log('📋 Loading test:', testId);
+
         const response = await testAPI.getById(testId);
         const testData = response.data;
+
+        if (!testData) {
+          console.error('❌ No test data returned');
+          setLoading(false);
+          return;
+        }
+
+        console.log('✅ Test loaded:', testData.title);
 
         const mappedQuestions = testData.questions.map((q: any, index: number) => ({
           id: q.id || `q-${index}`,
@@ -88,17 +94,29 @@ const ExamWindow = () => {
         });
         setAnswers(initialAnswers);
 
-        // Start test attempt
-        try {
-          const attemptResponse = await testAPI.startAttempt(testId);
-          setAttemptId(attemptResponse.data.id);
-        } catch (err) {
-          console.error('Error starting attempt:', err);
+        // Start test attempt (optional - don't fail if it doesn't work)
+        if (user) {
+          try {
+            console.log('🚀 Starting test attempt...');
+            const attemptResponse = await testAPI.startAttempt(testId);
+            setAttemptId(attemptResponse.data.id);
+            console.log('✅ Attempt started:', attemptResponse.data.id);
+          } catch (err) {
+            console.warn('⚠️ Could not create attempt record:', err);
+            // Don't fail if we can't create attempt - exam can still be taken
+          }
+        } else {
+          console.warn('⚠️ User not authenticated, attempt tracking may not work');
         }
 
         setLoading(false);
-      } catch (err) {
-        console.error('Error loading test:', err);
+      } catch (err: any) {
+        console.error('❌ Error loading test:', err);
+        if (err.response?.status === 404) {
+          console.error('Test not found (404). TestID:', testId);
+        } else if (err.response?.status === 401) {
+          console.error('Unauthorized (401). Auth token may be missing.');
+        }
         setLoading(false);
       }
     };
