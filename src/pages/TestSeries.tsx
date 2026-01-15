@@ -39,13 +39,17 @@ import { testAPI } from '../utils/api';
 interface Test {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   duration: number;
   total_questions: number;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   section: 'VARC' | 'DILR' | 'QA';
-  topics: string[];
+  topics?: string[];
   total_marks: number;
+  exam: string; // CAT, XAT, NMAT, SNAP, GMAT, etc.
+  testType?: string; // full-length, section, chapter, previous-year
+  year?: number; // For previous year papers
+  slot?: number; // For exams with multiple slots
   created_at: string;
 }
 
@@ -364,6 +368,7 @@ const TestSeries = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
+  const [selectedExam, setSelectedExam] = useState<string>('CAT');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedChapter, setSelectedChapter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -376,11 +381,15 @@ const TestSeries = () => {
       setLoading(true);
       setError(null);
       const response = await testAPI.getAll();
-      setTests(response.data.tests || fullSubjectTests);
+      const allTests = response.data.tests || [];
+      
+      // Filter tests by selected exam
+      const filteredByExam = allTests.filter((test: Test) => test.exam === selectedExam);
+      setTests(filteredByExam);
     } catch (err) {
       console.error('Error loading tests:', err);
-      // Use default tests as fallback
-      setTests(fullSubjectTests);
+      setError('Failed to load tests. Please try again.');
+      setTests([]);
     } finally {
       setLoading(false);
     }
@@ -388,7 +397,7 @@ const TestSeries = () => {
 
   useEffect(() => {
     loadTests();
-  }, []);
+  }, [selectedExam]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -415,11 +424,26 @@ const TestSeries = () => {
 
   const filteredTests = tests.filter((test) => {
     if (!test) return false;
+    
     const matchesSearch = test.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       test.description?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSubject = !selectedSubject || test.section === selectedSubject;
     const matchesChapter = !selectedChapter || test.topics?.includes(selectedChapter);
-    return matchesSearch && matchesSubject && matchesChapter;
+    
+    // Filter by test type based on selected tab
+    let matchesTestType = true;
+    if (tabValue === 1) {
+      matchesTestType = test.testType === 'full-length';
+    } else if (tabValue === 2) {
+      matchesTestType = test.testType === 'section';
+    } else if (tabValue === 3) {
+      matchesTestType = test.testType === 'chapter';
+    } else if (tabValue === 4) {
+      matchesTestType = test.testType === 'previous-year';
+    }
+    // tabValue === 0 shows all tests
+    
+    return matchesSearch && matchesSubject && matchesChapter && matchesTestType;
   });
 
   return (
@@ -428,8 +452,27 @@ const TestSeries = () => {
         Test Series
       </Typography>
       <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-        Practice with our comprehensive test series to improve your CAT preparation
+        Practice with our comprehensive test series to improve your exam preparation
       </Typography>
+
+      {/* Exam Selector Dropdown */}
+      <Box sx={{ mb: 3 }}>
+        <FormControl fullWidth>
+          <InputLabel>Select Exam</InputLabel>
+          <Select
+            value={selectedExam}
+            onChange={(e) => setSelectedExam(e.target.value)}
+            label="Select Exam"
+          >
+            <MenuItem value="CAT">CAT</MenuItem>
+            <MenuItem value="XAT">XAT</MenuItem>
+            <MenuItem value="NMAT">NMAT</MenuItem>
+            <MenuItem value="SNAP">SNAP</MenuItem>
+            <MenuItem value="GMAT">GMAT</MenuItem>
+            {/* Add more exams as needed */}
+          </Select>
+        </FormControl>
+      </Box>
 
       <Box sx={{ mb: 3 }}>
         <TextField
@@ -450,22 +493,24 @@ const TestSeries = () => {
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange}>
           <Tab label="All Tests" />
-          <Tab label="Subject-wise" />
-          <Tab label="Chapter-wise" />
-          <Tab label="Previous Papers" />
+          <Tab label="Full-Length Tests" />
+          <Tab label="Section Tests" />
+          <Tab label="Chapter Tests" />
+          <Tab label="Previous Year Papers" />
         </Tabs>
       </Box>
 
-      {tabValue === 1 && (
+      {/* Subject Filter - shown for relevant tabs */}
+      {(tabValue === 1 || tabValue === 2 || tabValue === 3) && (
         <Box sx={{ mb: 3 }}>
           <FormControl fullWidth>
-            <InputLabel>Select Subject</InputLabel>
+            <InputLabel>Select Section</InputLabel>
             <Select
               value={selectedSubject}
               onChange={handleSubjectChange}
-              label="Select Subject"
+              label="Select Section"
             >
-              <MenuItem value="">All Subjects</MenuItem>
+              <MenuItem value="">All Sections</MenuItem>
               <MenuItem value="VARC">VARC</MenuItem>
               <MenuItem value="DILR">DILR</MenuItem>
               <MenuItem value="QA">QA</MenuItem>
@@ -474,18 +519,19 @@ const TestSeries = () => {
         </Box>
       )}
 
-      {tabValue === 2 && (
+      {/* Chapter Filter - shown only for chapter tests */}
+      {tabValue === 3 && (
         <Box sx={{ mb: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
-                <InputLabel>Select Subject</InputLabel>
+                <InputLabel>Select Section</InputLabel>
                 <Select
                   value={selectedSubject}
                   onChange={handleSubjectChange}
-                  label="Select Subject"
+                  label="Select Section"
                 >
-                  <MenuItem value="">All Subjects</MenuItem>
+                  <MenuItem value="">All Sections</MenuItem>
                   <MenuItem value="VARC">VARC</MenuItem>
                   <MenuItem value="DILR">DILR</MenuItem>
                   <MenuItem value="QA">QA</MenuItem>
@@ -517,65 +563,7 @@ const TestSeries = () => {
         </Box>
       )}
 
-      {tabValue === 3 && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            CAT Exam Previous Year Papers (2000 - 2024)
-          </Typography>
-          <Grid container spacing={3} sx={{ mt: 1 }}>
-            {['CAT 2024 Slot 1', 'CAT 2024 Slot 2', 'CAT 2024 Slot 3', 'CAT 2023 Slot 1'].map((paper, index) => (
-              <Grid item xs={12} key={index}>
-                <Card variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa' }}>
-                  <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                    {index + 1}. {paper}
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {['VARC', 'DILR', 'QA'].map((section) => (
-                      <Grid item xs={12} md={4} key={section}>
-                        <Card sx={{ height: '100%' }}>
-                          <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                              <Box sx={{
-                                width: 40, height: 40,
-                                bgcolor: section === 'VARC' ? '#ffe0b2' : section === 'DILR' ? '#ffccbc' : '#dcedc8',
-                                borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2,
-                                fontWeight: 'bold', color: '#555'
-                              }}>
-                                {section[0]}
-                              </Box>
-                              <Typography variant="h6">{section}</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                              <Typography variant="body2" color="text.secondary">Total Questions</Typography>
-                              <Typography variant="body2" fontWeight={600}>{section === 'VARC' ? 24 : section === 'QA' ? 22 : 20}</Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                              <Typography variant="body2" color="text.secondary">Duration</Typography>
-                              <Typography variant="body2" fontWeight={600} sx={{ display: 'flex', alignItems: 'center' }}>
-                                <TimerIcon sx={{ fontSize: 16, mr: 0.5, color: 'warning.main' }} /> 40 Mins
-                              </Typography>
-                            </Box>
-                          </CardContent>
-                          <CardActions sx={{ px: 2, pb: 2 }}>
-                            <Button variant="contained" color="primary" fullWidth sx={{ textTransform: 'none', bgcolor: '#e65100', '&:hover': { bgcolor: '#bf360c' } }}>
-                              Take Test
-                            </Button>
-                            <Button variant="outlined" fullWidth sx={{ ml: 1, textTransform: 'none', color: '#333', borderColor: '#333' }}>
-                              PDF
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
-
-      {tabValue !== 3 && (loading ? (
+      {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
           <Typography>Loading tests...</Typography>
         </Box>
@@ -610,7 +598,7 @@ const TestSeries = () => {
             </Grid>
           )}
         </Grid>
-      ))}
+      )}
     </Box>
   );
 };
