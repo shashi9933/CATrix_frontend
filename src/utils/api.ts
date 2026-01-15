@@ -82,6 +82,22 @@ export const testAPI = {
   create: (testData: any) =>
     api.post('tests', testData),
   
+  // Start test attempt
+  startAttempt: (testId: string) =>
+    api.post(`tests/attempt/start/${testId}`, {}),
+  
+  // Save answer (auto-save)
+  saveAnswer: (attemptId: string, questionId: string, selectedAnswer: string, timeTaken?: number) =>
+    api.post(`tests/attempt/${attemptId}/answer`, { questionId, selectedAnswer, timeTaken }),
+  
+  // Submit test
+  submitAttempt: (attemptId: string) =>
+    api.post(`tests/attempt/${attemptId}/submit`, {}),
+  
+  // Get attempt details
+  getAttempt: (attemptId: string) =>
+    api.get(`tests/attempt/${attemptId}`),
+  
   // Aliases for compatibility
   createAttempt: (testId: string) =>
     api.post('test-attempts', { testId }),

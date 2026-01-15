@@ -13,6 +13,9 @@ import Resources from './pages/Resources';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Test from './pages/Test';
+import ExamInstructions from './pages/ExamInstructions';
+import ExamDeclaration from './pages/ExamDeclaration';
+import ExamWindow from './pages/ExamWindow';
 import AdminPanel from './pages/AdminPanel';
 
 const theme = createTheme({
@@ -136,6 +139,9 @@ const App = () => {
             >
               <Route index element={<Dashboard />} />
               <Route path="test-series" element={<TestSeries />} />
+              <Route path="exam-instructions/:testId" element={<ExamInstructions />} />
+              <Route path="exam-declaration/:testId" element={<ExamDeclaration />} />
+              <Route path="exam/:testId" element={<ExamWindow />} />
               <Route path="test/:testId" element={<Test />} />
               <Route path="study-materials" element={<StudyMaterials />} />
               <Route path="analytics" element={<Analytics />} />

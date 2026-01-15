@@ -431,7 +431,8 @@ const TestSeries = () => {
       navigate('/login');
       return;
     }
-    navigate(`/test/${testId}`);
+    // Navigate to instructions as first step in exam flow
+    navigate(`/exam-instructions/${testId}`);
   };
 
   const filteredTests = tests.filter((test) => {
