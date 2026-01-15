@@ -217,9 +217,13 @@ const TestCard = ({
             Topics Covered
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {test.topics.map((topic) => (
-              <Chip key={topic} label={topic} size="small" />
-            ))}
+            {test.topics && test.topics.length > 0 ? (
+              test.topics.map((topic) => (
+                <Chip key={topic} label={topic} size="small" />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">No topics specified</Typography>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -381,7 +385,7 @@ const TestSeries = () => {
       setLoading(true);
       setError(null);
       const response = await testAPI.getAll();
-      const allTests = response.data.tests || [];
+      const allTests = Array.isArray(response.data) ? response.data : (response.data?.tests || []);
       
       // Filter tests by selected exam
       const filteredByExam = allTests.filter((test: Test) => test.exam === selectedExam);

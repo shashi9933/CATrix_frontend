@@ -111,7 +111,7 @@ export const analyticsAPI = {
     api.get('analytics'),
   
   getUserAnalytics: () =>
-    api.get('analytics/user'),
+    api.get('analytics'),
   
   getRecentTests: () =>
     api.get('analytics/recent-tests'),
