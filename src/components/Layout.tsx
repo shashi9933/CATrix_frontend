@@ -155,41 +155,47 @@ const Layout = () => {
         ))}
       </List>
       <Divider />
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+      <Box sx={{ p: isCollapsed ? 1 : 2, display: 'flex', flexDirection: 'column', gap: 1, justifyContent: isCollapsed ? 'center' : 'flex-start', alignItems: isCollapsed ? 'center' : 'stretch' }}>
         {!user ? (
           <>
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<LoginIcon />}
-              fullWidth
-              sx={{ mb: 1, borderRadius: 2 }}
-              onClick={() => handleNavigation('/login')}
-            >
-              Login
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<PersonAddIcon />}
-              fullWidth
-              sx={{ borderRadius: 2 }}
-              onClick={() => handleNavigation('/signup')}
-            >
-              Signup
-            </Button>
+            <Tooltip title={isCollapsed ? "Login" : ""} placement="right">
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<LoginIcon />}
+                fullWidth={!isCollapsed}
+                sx={{ mb: 1, borderRadius: 2, minWidth: isCollapsed ? 48 : 'auto' }}
+                onClick={() => handleNavigation('/login')}
+              >
+                {!isCollapsed && 'Login'}
+              </Button>
+            </Tooltip>
+            <Tooltip title={isCollapsed ? "Signup" : ""} placement="right">
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<PersonAddIcon />}
+                fullWidth={!isCollapsed}
+                sx={{ borderRadius: 2, minWidth: isCollapsed ? 48 : 'auto' }}
+                onClick={() => handleNavigation('/signup')}
+              >
+                {!isCollapsed && 'Signup'}
+              </Button>
+            </Tooltip>
           </>
         ) : (
-          <Button
-            variant="outlined"
-            color="primary"
-            startIcon={<LogoutIcon />}
-            fullWidth
-            sx={{ borderRadius: 2 }}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+          <Tooltip title={isCollapsed ? "Logout" : ""} placement="right">
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<LogoutIcon />}
+              fullWidth={!isCollapsed}
+              sx={{ borderRadius: 2, minWidth: isCollapsed ? 48 : 'auto' }}
+              onClick={handleLogout}
+            >
+              {!isCollapsed && 'Logout'}
+            </Button>
+          </Tooltip>
         )}
       </Box>
     </Box>

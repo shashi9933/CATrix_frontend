@@ -12,7 +12,7 @@ import Assistant from './pages/Assistant';
 import Resources from './pages/Resources';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import TestAttempt from './pages/TestAttempt';
+import Test from './pages/Test';
 import AdminPanel from './pages/AdminPanel';
 
 const theme = createTheme({
@@ -136,7 +136,7 @@ const App = () => {
             >
               <Route index element={<Dashboard />} />
               <Route path="test-series" element={<TestSeries />} />
-              <Route path="test/:testId" element={<TestAttempt />} />
+              <Route path="test/:testId" element={<Test />} />
               <Route path="study-materials" element={<StudyMaterials />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="colleges" element={<Colleges />} />
