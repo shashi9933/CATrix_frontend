@@ -190,8 +190,7 @@ const ExamWindow = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentQuestion = test?.questions[currentQuestionIndex];
-  const currentAnswer = currentQuestion ? answers.get(currentQuestion.id) : null;
+
 
   const handleAnswerChange = (answer: string) => {
     if (!currentQuestion || !attemptId) return;
@@ -313,13 +312,37 @@ const ExamWindow = () => {
     );
   }
 
-  if (!test || !currentQuestion) {
+  if (!test) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff', fontFamily: '"Segoe UI", Arial, sans-serif' }}>
-        <Typography sx={{ fontSize: '16px', color: '#d32f2f' }}>Error loading exam. Please refresh.</Typography>
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography sx={{ fontSize: '16px', color: '#d32f2f', marginBottom: '16px' }}>Error loading exam</Typography>
+          <Typography sx={{ fontSize: '12px', color: '#999', marginBottom: '16px' }}>Please check the browser console for details</Typography>
+          <Button onClick={() => window.location.reload()}>Reload</Button>
+        </Box>
       </Box>
     );
   }
+
+  if (!test.questions || test.questions.length === 0) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff', fontFamily: '"Segoe UI", Arial, sans-serif' }}>
+        <Typography sx={{ fontSize: '16px', color: '#d32f2f' }}>No questions found in this test</Typography>
+      </Box>
+    );
+  }
+
+  const currentQuestion = test.questions[currentQuestionIndex];
+  
+  if (!currentQuestion) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff', fontFamily: '"Segoe UI", Arial, sans-serif' }}>
+        <Typography sx={{ fontSize: '16px', color: '#d32f2f' }}>Error: Current question not found. Please refresh.</Typography>
+      </Box>
+    );
+  }
+
+  const currentAnswer = answers.get(currentQuestion.id) || null;
 
   if (submitted) {
     const answeredCount = Array.from(answers.values()).filter((a) => a.answer).length;
