@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
+import { useGoogleLogin } from '@react-oauth/google';
 import {
   Box,
   Button,
@@ -44,15 +46,35 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse: any) => {
+      try {
+        setLoading(true);
+        const userInfo = await axios.get(
+          'https://www.googleapis.com/oauth2/v3/userinfo',
+          {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+          }
+        );
+
+        const { email, name, sub: googleId, picture } = userInfo.data;
+        await signInWithGoogle(email, name, googleId, picture);
+        navigate('/');
+      } catch (err) {
+        setError('Failed to get user info from Google');
+        console.error(err);
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError('Google Login Failed');
       setLoading(false);
-    }
+    },
+  });
+
+  const handleGoogleSignIn = () => {
+    setError(null);
+    googleLogin();
   };
 
   return (
