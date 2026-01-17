@@ -14,7 +14,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (email: string, name: string, googleId: string, picture?: string) => Promise<void>;
   signInGuest: () => Promise<void>;
   updateProfile: (updates: { name?: string }) => Promise<void>;
 }
@@ -95,10 +95,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signInWithGoogle = async () => {
-    // Google OAuth sign-in - to be implemented with backend OAuth support
-    // For now, throw error until backend OAuth is configured
-    throw new Error('Google Sign-In not yet configured. Please use email/password login.');
+  const signInWithGoogle = async (email: string, name: string, googleId: string, picture?: string) => {
+    try {
+      const response = await authAPI.googleLogin(email, name, googleId, picture);
+      const { user, token } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
+    } catch (error) {
+      throw error;
+    }
   };
 
   const value = {

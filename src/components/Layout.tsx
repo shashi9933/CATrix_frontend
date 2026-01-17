@@ -41,6 +41,7 @@ import {
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 const drawerWidth = 280;
 const collapsedDrawerWidth = 72;
@@ -246,6 +247,7 @@ const Layout = () => {
             </Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ThemeSwitcher />
             {!user ? (
               <>
                 <Button color="primary" onClick={() => handleNavigation('/login')} sx={{ borderRadius: 2 }}>
