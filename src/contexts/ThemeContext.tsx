@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThemeProvider, Theme, CssBaseline } from '@mui/material';
-import { aeonTheme, ecoTheme, darkTheme, newDarkTheme, neonTheme } from '../theme/themes';
+import { aeonTheme, ecoTheme, whiteTheme, newDarkTheme, neonTheme } from '../theme/themes';
 
-type ThemeName = 'dark' | 'aeon' | 'eco' | 'newDark' | 'neon';
+type ThemeName = 'white' | 'aeon' | 'eco' | 'newDark' | 'neon';
 
 interface ThemeContextType {
     currentTheme: ThemeName;
@@ -12,12 +12,12 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const CustomThemeProvider = ({ children }: { children: React.ReactNode }) => {
-    const [themeName, setThemeName] = useState<ThemeName>('newDark'); // Default to new dark theme
+    const [themeName, setThemeName] = useState<ThemeName>('aeon'); // Default to Aeon Glass theme
 
     useEffect(() => {
         // Load saved theme from local storage
         const savedTheme = localStorage.getItem('app-theme') as ThemeName;
-        if (savedTheme && ['dark', 'aeon', 'eco', 'newDark', 'neon'].includes(savedTheme)) {
+        if (savedTheme && ['white', 'aeon', 'eco', 'newDark', 'neon'].includes(savedTheme)) {
             setThemeName(savedTheme);
         }
     }, []);
@@ -33,7 +33,8 @@ export const CustomThemeProvider = ({ children }: { children: React.ReactNode })
             case 'eco': return ecoTheme;
             case 'neon': return neonTheme;
             case 'newDark': return newDarkTheme;
-            default: return darkTheme;
+            case 'white': return whiteTheme;
+            default: return aeonTheme; // Default to Aeon Glass
         }
     };
 

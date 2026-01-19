@@ -21,11 +21,36 @@ import AdminPanel from './pages/AdminPanel';
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
+  // Show loading state while authentication is being verified
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        fontFamily: '"Segoe UI", Arial, sans-serif',
+        fontSize: '16px',
+        color: '#666'
+      }}>
+        <div>
+          <div style={{ marginBottom: '16px', textAlign: 'center' }}>🔐 Verifying authentication...</div>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #1976d2',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }}></div>
+        </div>
+      </div>
+    );
   }
 
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  // Only redirect after loading is complete and user is still null
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
 const App = () => {

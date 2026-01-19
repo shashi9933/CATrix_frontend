@@ -57,7 +57,7 @@ const TOPICS_BY_SECTION: Record<string, string[]> = {
 };
 
 const StudyMaterials = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [materials, setMaterials] = useState<StudyMaterialType[]>([]);
   const [filteredMaterials, setFilteredMaterials] = useState<StudyMaterialType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -98,8 +98,10 @@ const StudyMaterials = () => {
   };
 
   useEffect(() => {
+    // Wait for auth loading to complete before loading materials
+    if (authLoading) return;
     loadMaterials();
-  }, []);
+  }, [authLoading]);
 
   // Apply filters
   useEffect(() => {
@@ -161,7 +163,7 @@ const StudyMaterials = () => {
       } else {
         await studyMaterialAPI.saveMaterial(id);
       }
-      
+
       const updated = materials.map(m =>
         m.id === id ? { ...m, isSaved: !isSaved } : m
       );
@@ -177,7 +179,7 @@ const StudyMaterials = () => {
   const handleMarkMaterial = async (id: string, isMarked: boolean) => {
     try {
       await studyMaterialAPI.markMaterial(id, !isMarked);
-      
+
       const updated = materials.map(m =>
         m.id === id ? { ...m, isMarked: !isMarked } : m
       );
@@ -305,9 +307,9 @@ const StudyMaterials = () => {
                         <Chip label={material.section} size="small" color="primary" variant="outlined" />
                         <Chip label={material.topic} size="small" variant="outlined" />
                         {material.difficulty && (
-                          <Chip 
-                            label={material.difficulty} 
-                            size="small" 
+                          <Chip
+                            label={material.difficulty}
+                            size="small"
                             color={material.difficulty === 'easy' ? 'success' : material.difficulty === 'medium' ? 'warning' : 'error'}
                             variant="outlined"
                           />
@@ -456,8 +458,8 @@ const StudyMaterials = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handleCreateMaterial} 
+          <Button
+            onClick={handleCreateMaterial}
             variant="contained"
             disabled={loading}
           >

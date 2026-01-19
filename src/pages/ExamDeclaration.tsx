@@ -18,6 +18,7 @@ const ExamDeclaration = () => {
     readyToBegin: false,
   });
 
+  // All hooks must come before any conditional returns
   useEffect(() => {
     // Only redirect if loading is complete AND user is not authenticated
     if (loading) return;
@@ -26,6 +27,18 @@ const ExamDeclaration = () => {
     }
   }, [user, loading, navigate]);
 
+  useEffect(() => {
+    // Load test data only when user is confirmed authenticated
+    if (!user || loading) return;
+
+    if (testId) {
+      testAPI.getById(testId).then((res) => {
+        setTestData(res.data);
+      });
+    }
+  }, [testId, user, loading]);
+
+  // Conditional returns come AFTER all hooks
   if (loading) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff' }}>
@@ -37,17 +50,6 @@ const ExamDeclaration = () => {
   if (!user) {
     return null; // Will redirect via useEffect
   }
-
-  useEffect(() => {
-    // Load test data only when user is confirmed authenticated
-    if (!user || loading) return;
-    
-    if (testId) {
-      testAPI.getById(testId).then((res) => {
-        setTestData(res.data);
-      });
-    }
-  }, [testId, user, loading]);
 
   const allChecked = Object.values(checkboxes).every((v) => v);
 

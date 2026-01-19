@@ -32,24 +32,30 @@ interface Answer {
 
 const ExamWindow = () => {
   const { testId } = useParams<{ testId: string }>();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const [test, setTest] = useState<Test | null>(null);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<string, Answer>>(new Map());
   const [timeLeft, setTimeLeft] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [testLoading, setTestLoading] = useState(true);
   const [confirmSubmit, setConfirmSubmit] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   // Load test data
   useEffect(() => {
     const loadTest = async () => {
+      // Wait for auth loading to complete before loading test
+      if (loading) {
+        console.log('⏳ Waiting for authentication to complete...');
+        return;
+      }
+
       try {
         if (!testId) {
           console.error('❌ No testId provided');
-          setLoading(false);
+          setTestLoading(false);
           return;
         }
 
@@ -60,7 +66,7 @@ const ExamWindow = () => {
 
         if (!testData) {
           console.error('❌ No test data returned');
-          setLoading(false);
+          setTestLoading(false);
           return;
         }
 
@@ -94,10 +100,10 @@ const ExamWindow = () => {
         });
         setAnswers(initialAnswers);
 
-        // Start test attempt (optional - don't fail if it doesn't work)
+        // Start test attempt (only if user is authenticated)
         if (user) {
           try {
-            console.log('🚀 Starting test attempt...');
+            console.log('🚀 Starting test attempt for user:', user.id);
             const attemptResponse = await testAPI.startAttempt(testId);
             setAttemptId(attemptResponse.data.id);
             console.log('✅ Attempt started:', attemptResponse.data.id);
@@ -106,10 +112,10 @@ const ExamWindow = () => {
             // Don't fail if we can't create attempt - exam can still be taken
           }
         } else {
-          console.warn('⚠️ User not authenticated, attempt tracking may not work');
+          console.warn('⚠️ User not authenticated, attempt tracking disabled');
         }
 
-        setLoading(false);
+        setTestLoading(false);
       } catch (err: any) {
         console.error('❌ Error loading test:', err);
         if (err.response?.status === 404) {
@@ -117,12 +123,12 @@ const ExamWindow = () => {
         } else if (err.response?.status === 401) {
           console.error('Unauthorized (401). Auth token may be missing.');
         }
-        setLoading(false);
+        setTestLoading(false);
       }
     };
 
     loadTest();
-  }, [testId, user]);
+  }, [testId, loading]); // Depend on loading instead of user to prevent re-runs
 
   // Timer countdown
   useEffect(() => {
@@ -304,7 +310,7 @@ const ExamWindow = () => {
     }
   };
 
-  if (loading) {
+  if (testLoading) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff', fontFamily: '"Segoe UI", Arial, sans-serif' }}>
         <Typography sx={{ fontSize: '16px', color: '#666' }}>Please wait… Exam is loading</Typography>
@@ -333,7 +339,7 @@ const ExamWindow = () => {
   }
 
   const currentQuestion = test.questions[currentQuestionIndex];
-  
+
   if (!currentQuestion) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff', fontFamily: '"Segoe UI", Arial, sans-serif' }}>

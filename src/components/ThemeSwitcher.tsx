@@ -20,7 +20,7 @@ export const ThemeSwitcher = () => {
         setAnchorEl(null);
     };
 
-    const handleThemeChange = (themeName: 'dark' | 'aeon' | 'eco' | 'newDark' | 'neon') => {
+    const handleThemeChange = (themeName: 'white' | 'aeon' | 'eco' | 'newDark' | 'neon') => {
         setTheme(themeName);
         handleClose();
     };
@@ -31,7 +31,7 @@ export const ThemeSwitcher = () => {
             case 'eco': return <ForestIcon />;
             case 'neon': return <TipsAndUpdatesIcon />;
             case 'newDark': return <NightsStayIcon />;
-            default: return <DarkModeIcon />;
+            default: return <DarkModeIcon />; // White theme icon
         }
     };
 
@@ -85,11 +85,11 @@ export const ThemeSwitcher = () => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem onClick={() => handleThemeChange('dark')} selected={currentTheme === 'dark'}>
+                <MenuItem onClick={() => handleThemeChange('white')} selected={currentTheme === 'white'}>
                     <ListItemIcon>
-                        <DarkModeIcon fontSize="small" />
+                        <DarkModeIcon fontSize="small" sx={{ color: '#6C63FF' }} />
                     </ListItemIcon>
-                    <ListItemText>Classic Dark</ListItemText>
+                    <ListItemText>Classic White</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={() => handleThemeChange('newDark')} selected={currentTheme === 'newDark'}>
                     <ListItemIcon>

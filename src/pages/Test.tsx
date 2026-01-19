@@ -59,13 +59,13 @@ interface Answer {
 const Test = () => {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const [test, setTest] = useState<Test | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Map<string, Answer>>(new Map());
   const [timeLeft, setTimeLeft] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [testLoading, setTestLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
   const [confirmSubmit, setConfirmSubmit] = useState(false);
@@ -74,6 +74,9 @@ const Test = () => {
   useEffect(() => {
     const loadTest = async () => {
       try {
+        // Wait for auth loading to complete
+        if (loading) return;
+
         if (!user) {
           navigate('/login');
           return;
@@ -81,13 +84,13 @@ const Test = () => {
 
         if (!testId) {
           setError('No test ID provided');
-          setLoading(false);
+          setTestLoading(false);
           return;
         }
 
         const response = await testAPI.getById(testId);
         const testData = response.data;
-        
+
         // Map questions to ensure they have all required fields
         const mappedQuestions = testData.questions.map((q: any, index: number) => ({
           id: q.id || `q-${index}`,
@@ -119,16 +122,16 @@ const Test = () => {
         });
         setAnswers(initialAnswers);
 
-        setLoading(false);
+        setTestLoading(false);
       } catch (err) {
         console.error('Error loading test:', err);
         setError('Failed to load test. Please try again.');
-        setLoading(false);
+        setTestLoading(false);
       }
     };
 
     loadTest();
-  }, [testId, user, navigate]);
+  }, [testId, user, loading, navigate]);
 
   // Timer countdown
   useEffect(() => {
@@ -223,7 +226,7 @@ const Test = () => {
     }
   };
 
-  if (loading) {
+  if (testLoading) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
         <Typography>Loading test...</Typography>
@@ -422,8 +425,8 @@ const Test = () => {
                       currentQuestion.difficulty === 'HARD'
                         ? 'error'
                         : currentQuestion.difficulty === 'MEDIUM'
-                        ? 'warning'
-                        : 'success'
+                          ? 'warning'
+                          : 'success'
                     }
                   />
                 </Box>

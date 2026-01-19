@@ -20,8 +20,8 @@ const CARD_SHADOW = '0px 10px 30px rgba(0, 0, 0, 0.2)';
 const ELEVATED_SHADOW = '0px 15px 40px rgba(0, 0, 0, 0.3)';
 const HOVER_SHADOW = '0px 20px 50px rgba(0, 0, 0, 0.4)';
 
-// --- OPTION 1: CLASSIC DARK (Original - Enhanced) ---
-export const darkTheme = createTheme({
+// --- OPTION 1: CLASSIC WHITE (Original - Enhanced) ---
+export const whiteTheme = createTheme({
     ...commonSettings,
     palette: {
         mode: 'light',

@@ -27,26 +27,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check if token exists and verify it on mount
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Use a short timeout to avoid blocking the UI
-      const timer = setTimeout(() => {
-        authAPI.verify()
-          .then((response: any) => {
-            setUser(response.data.user);
-            setLoading(false);
-          })
-          .catch((error: any) => {
-            console.error('Token verification failed:', error);
+    const verifyToken = async () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      // Keep loading true while verifying
+      let retryCount = 0;
+      const maxRetries = 2;
+
+      while (retryCount <= maxRetries) {
+        try {
+          const response = await authAPI.verify();
+          setUser(response.data.user);
+          setLoading(false);
+          return; // Success, exit
+        } catch (error: any) {
+          console.error(`Token verification failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+
+          // Check if it's a network error (not 401/403)
+          const isNetworkError = !error.response || error.response.status >= 500;
+
+          if (isNetworkError && retryCount < maxRetries) {
+            // Retry on network errors
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
+            continue;
+          }
+
+          // If it's an auth error (401/403) or max retries reached, clear token
+          if (error.response?.status === 401 || error.response?.status === 403 || retryCount >= maxRetries) {
+            console.warn('Token is invalid or expired, clearing...');
             localStorage.removeItem('token');
-            setLoading(false);
-          });
-      }, 0); // Use setTimeout to defer verification to next tick
-      
-      return () => clearTimeout(timer);
-    } else {
-      setLoading(false);
-    }
+            setUser(null);
+          }
+
+          setLoading(false);
+          return;
+        }
+      }
+    };
+
+    verifyToken();
   }, []);
 
   const signIn = async (email: string, password: string) => {
