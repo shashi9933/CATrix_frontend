@@ -4,6 +4,8 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import ForestIcon from '@mui/icons-material/Forest';
+import SparklesIcon from '@mui/icons-material/Sparkles';
+import NightsStayIcon from '@mui/icons-material/NightsStay';
 
 export const ThemeSwitcher = () => {
     const { currentTheme, setTheme } = useThemeContext();
@@ -18,7 +20,7 @@ export const ThemeSwitcher = () => {
         setAnchorEl(null);
     };
 
-    const handleThemeChange = (themeName: 'dark' | 'aeon' | 'eco') => {
+    const handleThemeChange = (themeName: 'dark' | 'aeon' | 'eco' | 'newDark' | 'neon') => {
         setTheme(themeName);
         handleClose();
     };
@@ -27,6 +29,8 @@ export const ThemeSwitcher = () => {
         switch (currentTheme) {
             case 'aeon': return <LightModeIcon />;
             case 'eco': return <ForestIcon />;
+            case 'neon': return <SparklesIcon />;
+            case 'newDark': return <NightsStayIcon />;
             default: return <DarkModeIcon />;
         }
     };
@@ -56,7 +60,7 @@ export const ThemeSwitcher = () => {
                     elevation: 0,
                     sx: {
                         overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        filter: 'drop-shadow(0px 8px 24px rgba(0,0,0,0.4))',
                         mt: 1.5,
                         '& .MuiAvatar-root': {
                             width: 32,
@@ -86,6 +90,18 @@ export const ThemeSwitcher = () => {
                         <DarkModeIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Classic Dark</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleThemeChange('newDark')} selected={currentTheme === 'newDark'}>
+                    <ListItemIcon>
+                        <NightsStayIcon fontSize="small" sx={{ color: '#3B82F6' }} />
+                    </ListItemIcon>
+                    <ListItemText>Dark Mode</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleThemeChange('neon')} selected={currentTheme === 'neon'}>
+                    <ListItemIcon>
+                        <SparklesIcon fontSize="small" sx={{ color: '#06B6D4' }} />
+                    </ListItemIcon>
+                    <ListItemText>Neon</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={() => handleThemeChange('aeon')} selected={currentTheme === 'aeon'}>
                     <ListItemIcon>

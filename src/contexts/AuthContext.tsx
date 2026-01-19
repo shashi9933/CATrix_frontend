@@ -26,19 +26,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if token exists and verify it
+    // Check if token exists and verify it on mount
     const token = localStorage.getItem('token');
     if (token) {
-      authAPI.verify()
-        .then((response: any) => {
-          setUser(response.data.user);
-          setLoading(false);
-        })
-        .catch((error: any) => {
-          console.error('Token verification failed:', error);
-          localStorage.removeItem('token');
-          setLoading(false);
-        });
+      // Use a short timeout to avoid blocking the UI
+      const timer = setTimeout(() => {
+        authAPI.verify()
+          .then((response: any) => {
+            setUser(response.data.user);
+            setLoading(false);
+          })
+          .catch((error: any) => {
+            console.error('Token verification failed:', error);
+            localStorage.removeItem('token');
+            setLoading(false);
+          });
+      }, 0); // Use setTimeout to defer verification to next tick
+      
+      return () => clearTimeout(timer);
     } else {
       setLoading(false);
     }
