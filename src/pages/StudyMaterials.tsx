@@ -20,8 +20,6 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
   Paper,
@@ -66,7 +64,6 @@ const StudyMaterials = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [currentTab, setCurrentTab] = useState(0);
 
   // Filter states
   const [selectedSection, setSelectedSection] = useState('');

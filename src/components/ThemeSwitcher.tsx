@@ -4,7 +4,7 @@ import { useThemeContext } from '../contexts/ThemeContext';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import ForestIcon from '@mui/icons-material/Forest';
-import SparklesIcon from '@mui/icons-material/Sparkles';
+import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
 
 export const ThemeSwitcher = () => {
@@ -29,7 +29,7 @@ export const ThemeSwitcher = () => {
         switch (currentTheme) {
             case 'aeon': return <LightModeIcon />;
             case 'eco': return <ForestIcon />;
-            case 'neon': return <SparklesIcon />;
+            case 'neon': return <TipsAndUpdatesIcon />;
             case 'newDark': return <NightsStayIcon />;
             default: return <DarkModeIcon />;
         }
@@ -99,7 +99,7 @@ export const ThemeSwitcher = () => {
                 </MenuItem>
                 <MenuItem onClick={() => handleThemeChange('neon')} selected={currentTheme === 'neon'}>
                     <ListItemIcon>
-                        <SparklesIcon fontSize="small" sx={{ color: '#06B6D4' }} />
+                        <TipsAndUpdatesIcon fontSize="small" sx={{ color: '#06B6D4' }} />
                     </ListItemIcon>
                     <ListItemText>Neon</ListItemText>
                 </MenuItem>

@@ -1,7 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 // Use environment variable or default to Render backend
 let API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined)
