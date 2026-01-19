@@ -7,33 +7,50 @@ import { testAPI } from '../utils/api';
 const ExamInstructions = () => {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const [testData, setTestData] = useState<any>(null);
 
   useEffect(() => {
+    // Only redirect if loading is complete AND user is not authenticated
+    if (loading) return;
     if (!user) {
       navigate('/login');
-      return;
     }
+  }, [user, loading, navigate]);
 
-    // Load test data for metadata
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff' }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect via useEffect
+  }
+
+  useEffect(() => {
+    // Load test data only when user is confirmed authenticated
+    if (!user || loading) return;
+    
     if (testId) {
       testAPI.getById(testId).then((res) => {
         setTestData(res.data);
       });
     }
-  }, [testId, user, navigate]);
+  }, [testId, user, loading]);
+
+  const handleNext = () => {
+    navigate(`/exam-declaration/${testId}`);
+  };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const element = e.currentTarget;
     const isAtBottom =
       element.scrollHeight - element.scrollTop - element.clientHeight < 10;
     setScrolledToBottom(isAtBottom);
-  };
-
-  const handleNext = () => {
-    navigate(`/exam-declaration/${testId}`);
   };
 
   return (

@@ -7,7 +7,7 @@ import { testAPI } from '../utils/api';
 const ExamDeclaration = () => {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [testData, setTestData] = useState<any>(null);
 
   const [checkboxes, setCheckboxes] = useState({
@@ -19,17 +19,37 @@ const ExamDeclaration = () => {
   });
 
   useEffect(() => {
+    // Only redirect if loading is complete AND user is not authenticated
+    if (loading) return;
     if (!user) {
       navigate('/login');
-      return;
     }
+  }, [user, loading, navigate]);
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: '#fff' }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect via useEffect
+  }
+
+  useEffect(() => {
+    // Load test data only when user is confirmed authenticated
+    if (!user || loading) return;
+    
     if (testId) {
       testAPI.getById(testId).then((res) => {
         setTestData(res.data);
       });
     }
-  }, [testId, user, navigate]);
+  }, [testId, user, loading]);
+
+  const allChecked = Object.values(checkboxes).every((v) => v);
 
   const handleCheckboxChange = (key: keyof typeof checkboxes) => {
     setCheckboxes((prev) => ({
@@ -37,8 +57,6 @@ const ExamDeclaration = () => {
       [key]: !prev[key],
     }));
   };
-
-  const allChecked = Object.values(checkboxes).every((v) => v);
 
   const handleStartTest = () => {
     if (allChecked && testId) {
